@@ -1,0 +1,32 @@
+# Docker 문법 버전
+version: '3.8'
+
+services:
+  # MariaDB
+  auth-db:
+    image: mariadb:11.4
+    container_name: auth-lab-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: auth_lab
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+  # Redis
+  auth-redis:
+    image: redis:alpine
+    container_name: auth-lab-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis_data:/data
+    command:
+      # 재시작해도 데이터 유지(데이터 영속성 옵션)
+      redis-server --appendonly yes
