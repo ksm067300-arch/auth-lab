@@ -32,11 +32,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	// 서버 Secret Key 생성 및 검증
-	// 1.5.0 라이브러리에 XSS 취약점 이슈가 있어 구버전 http
-	implementation('com.warrenstrange:googleauth:1.5.0') {
-		exclude group: 'org.apache.httpcomponents', module: 'httpclient'
-	}
-	implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+	implementation 'com.warrenstrange:googleauth:1.6.0'
 
 	// QR Code 생성 라이브러리
 	implementation 'com.google.zxing:core:3.5.2'
