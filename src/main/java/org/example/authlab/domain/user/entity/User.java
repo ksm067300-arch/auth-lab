@@ -30,6 +30,9 @@ public class User {
     @Column(name = "totp_secret")
     private String totpSecret;
 
+    @Column(name = "email")
+    private String email;
+
 
     // TOTP 활성화
     public void enableTotp(String secret) {
