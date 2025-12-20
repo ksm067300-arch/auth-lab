@@ -107,12 +107,19 @@ export default function Home() {
 
         {/* STEP 1: 로그인 화면 */}
         {step === "LOGIN" && (
-          <div className="flex flex-col gap-4">
+          <form 
+            className="flex flex-col gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLogin();
+            }}
+          >
             <input
               className="border p-2 rounded text-black"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              autoFocus
             />
             <input
               className="border p-2 rounded text-black"
@@ -127,12 +134,18 @@ export default function Home() {
             >
               로그인
             </button>
-          </div>
+          </form>
         )}
 
         {/* STEP 2: 2차 인증 화면 */}
         {step === "2FA" && (
-          <div className="flex flex-col gap-4">
+          <form 
+            className="flex flex-col gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleVerify2FA();
+            }}
+          >
             <div className="text-center bg-yellow-100 p-2 rounded text-sm text-yellow-800 mb-2">
               ⚠️ {message}
             </div>
@@ -142,6 +155,7 @@ export default function Home() {
               maxLength={6}
               value={code}
               onChange={(e) => setCode(e.target.value)}
+              autoFocus
             />
             <button
               onClick={handleVerify2FA}
@@ -149,7 +163,7 @@ export default function Home() {
             >
               인증 확인
             </button>
-          </div>
+          </form>
         )}
 
         {/* STEP 3: 대시보드 (로그인 성공) */}
