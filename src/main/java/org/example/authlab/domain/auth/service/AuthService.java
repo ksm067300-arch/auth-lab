@@ -1,17 +1,22 @@
 package org.example.authlab.domain.auth.service;
 
+import com.warrenstrange.googleauth.GoogleAuthenticator;
 import lombok.RequiredArgsConstructor;
 import org.example.authlab.domain.auth.dto.request.LoginRequest;
 import org.example.authlab.domain.auth.dto.request.SignupRequest;
 import org.example.authlab.domain.auth.dto.response.LoginResponse;
 import org.example.authlab.domain.auth.dto.response.SignupResponse;
 import org.example.authlab.domain.auth.jwt.JwtUtil;
+import org.example.authlab.domain.user.entity.TwoFactorType;
 import org.example.authlab.domain.user.entity.User;
 import org.example.authlab.domain.user.service.UserService;
 import org.example.authlab.global.util.RedisUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +51,26 @@ public class AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtUtil.createToken(user.getUsername());
+        if(TwoFactorType.TOTP.equals(user.getTwoFactorType())) {
+            String preAuthToken = UUID.randomUUID().toString();
 
-        return new LoginResponse(token);
+            redisUtil.set("PRE_AUTH:" + preAuthToken, user.getUsername(), 300, TimeUnit.SECONDS);
+
+            return LoginResponse.builder()
+                    .requiresTwoFactor(true)
+                    .preAuthToken(preAuthToken)
+                    .message("2단계 인증(OTP)이 필요합니다.")
+                    .build();
+        }
+
+        String accessToken = jwtUtil.createAccessToken(user.getUsername());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUsername());
+
+        return LoginResponse.builder()
+                .requiresTwoFactor(false)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public void logout(String accessToken) {
