@@ -1,0 +1,11 @@
+version: '3'
+services:
+  frontend:
+    image: node:24-alpine
+    container_name: auth-front
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    command: npm run dev
